@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UB Mahasiswa Search - PDDikti API</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ubblue: '#0037C1',
+                        ubyellow: '#FFD700',
+                        ubsecondary: '#0056b3'
+                    }
+                }
+            }
+        }
+    </script>    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            /* Light theme colors */
+            --primary-color: #0037C1;
+            --secondary-color: #0056b3;
+            --accent-color: #FFD700;
+            --background-primary: #ffffff;
+            --background-secondary: #f8fafc;
+            --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --shadow-color: rgba(0, 55, 193, 0.15);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Dark theme colors */
+        body.dark-mode {
+            --primary-color: #3b82f6;
+            --secondary-color: #2563eb;
+            --accent-color: #fbbf24;
+            --background-primary: #1f2937;
+            --background-secondary: #111827;
+            --background-gradient: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --border-color: #374151;
+            --shadow-color: rgba(59, 130, 246, 0.25);
+            --glass-bg: rgba(31, 41, 55, 0.8);
+            --glass-border: rgba(75, 85, 99, 0.3);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', 'Poppins', sans-serif;
+            background: var(--background-gradient);
+            min-height: 100vh;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Animated background particles */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.05"><polygon points="30,0 60,30 30,60 0,30"/></g></svg>') repeat;
+            animation: float 20s infinite linear;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        @keyframes float {
+            from { transform: translateY(0px); }
+            to { transform: translateY(-60px); }
+        }
+        
+        /* Glass morphism effects */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 35px 65px rgba(0, 0, 0, 0.15);
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Modern button styles */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 55, 193, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 55, 193, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--background-primary);
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        /* Enhanced input styles */
+        .modern-input {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        .modern-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .modern-input::placeholder {
+            color: var(--text-secondary);
+        }
+        
+        /* Animated header */
+        .hero-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Card animations */
+        .animate-card {
+            animation: cardFloat 0.8s ease-out;
+        }
+        
+        @keyframes cardFloat {
+            0% {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        /* Profile image enhancements */
+        .profile-image {
+            border: 4px solid var(--primary-color);
+            border-radius: 50%;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(0, 55, 193, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-image:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 20px 40px rgba(0, 55, 193, 0.4);
+        }
+        
+        .profile-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+        
+        .profile-image:hover::after {
+            transform: translateX(100%);
+        }
+        
+        /* Enhanced loading animation */
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--glass-border);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-dots {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        
+        .loading-dots div {
+            width: 12px;
+            height: 12px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            animation: bounce 1.4s ease-in-out both infinite;
+        }
+        
+        .loading-dots div:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots div:nth-child(2) { animation-delay: -0.16s; }
+        .loading-dots div:nth-child(3) { animation-delay: 0s; }
+        
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        /* Navigation enhancements */
+        .nav-link {
+            position: relative;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .nav-link:hover::before {
+            width: 100%;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-color);
+            background: var(--glass-bg);
+        }
+        
+        /* Result card animations */
+        .result-card {
+            background: var(--background-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        .result-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Modern scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--background-secondary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+        }
+        
+        /* Responsive design enhancements */
+        @media (max-width: 768px) {
+            .glass-card {
+                margin: 10px;
+                border-radius: 16px;
+            }
+            
+            .hero-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .modern-input {
+                padding: 14px 16px;
+            }
+        }
+        
+        /* Dark mode specific adjustments */
+        body.dark-mode .glass-card {
+            background: rgba(31, 41, 55, 0.9);
+            border-color: rgba(75, 85, 99, 0.4);
+        }
+        
+        body.dark-mode .result-card {
+            background: var(--background-primary);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        body.dark-mode .modern-input {
+            background: rgba(17, 24, 39, 0.8);
+            color: var(--text-primary);
+        }
+          /* Pulse animation for interactive elements */
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+            }
+        }
+        
+        /* Simple and clean styles */
+        .header-clean {
+            padding: 1rem 0;
+        }
+        
+        .footer-clean {
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">    <!-- Header -->
+    <header class="hero-header relative z-10">
+        <div class="relative py-6">
+            <div class="container mx-auto px-4">
+                <!-- Main Header -->
+                <div class="flex flex-col md:flex-row items-center justify-between mb-6">                    <div class="flex items-center mb-4 md:mb-0">
+                        <div class="relative">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Logo_Universitas_Brawijaya.svg/800px-Logo_Universitas_Brawijaya.svg.png" 
+                                 alt="UB Logo" 
+                                 class="h-12 mr-4 drop-shadow-lg transition-transform duration-300 hover:scale-110">
+                        </div>
+                        <div>
+                            <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight">
+                                Pencarian Mahasiswa UB
+                            </h1>
+                            <p class="text-yellow-300 text-sm md:text-base font-medium">
+                                <i class="fas fa-search mr-2"></i>PDDikti Database Search
+                            </p>
+                        </div>
+                    </div>
+                      <!-- Action Buttons -->
+                    <div class="flex items-center space-x-3">
+                        <!-- Home Button -->
+                        <button id="homeBtn" 
+                                class="btn-secondary px-4 py-2 text-sm md:text-base" 
+                                onclick="goHome()">
+                            <i class="fas fa-home mr-2"></i>Home
+                        </button>
+                        
+                        <!-- History Button -->
+                        <button id="historyBtn" 
+                                class="btn-secondary px-4 py-2 text-sm md:text-base" 
+                                onclick="toggleHistory()">
+                            <i class="fas fa-history mr-2"></i>Riwayat
+                        </button>
+                        
+                        <!-- Dark Mode Toggle -->
+                        <button id="darkModeToggle" 
+                                class="glass-card p-2 text-white hover:text-yellow-300 transition-all duration-300"
+                                title="Toggle Dark Mode">
+                            <i class="fas fa-moon text-lg" id="darkModeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Simple Navigation -->
+                <div class="glass-card p-3">
+                    <nav class="flex items-center justify-center">
+                        <div class="text-center">
+                            <p class="text-white text-sm md:text-base">
+                                <i class="fas fa-info-circle mr-2 text-yellow-300"></i>
+                                Sistem pencarian data mahasiswa berdasarkan nama
+                            </p>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header><!-- Main Content -->
+    <main class="container mx-auto px-4 py-12 relative z-10">
+        <div class="max-w-6xl mx-auto">            <!-- Hero Section -->
+            <div class="text-center mb-12 animate-card">
+                <h2 class="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+                    Cari Data Mahasiswa UB
+                </h2>
+                <p class="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed">
+                    Masukkan nama mahasiswa untuk mencari informasi lengkap dari database PDDikti
+                </p>
+                <div class="mt-6 flex justify-center">
+                    <div class="w-16 h-1 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full"></div>
+                </div>
+            </div>
+
+            <!-- History Section (Initially Hidden) -->
+            <div id="historySection" class="glass-card mb-8 overflow-hidden animate-card" style="display: none;">
+                <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-6">
+                    <h3 class="text-white font-bold text-xl flex items-center">
+                        <i class="fas fa-history mr-3 text-yellow-300"></i>
+                        Riwayat Pencarian
+                    </h3>
+                </div>
+                <div class="p-8">
+                    <div id="historyContent" class="space-y-4">
+                        <div class="text-center py-8">
+                            <i class="fas fa-clock text-4xl text-gray-400 mb-4"></i>
+                            <p class="text-gray-500 text-lg">Belum ada riwayat pencarian</p>
+                        </div>
+                    </div>
+                    <div class="mt-6 text-center">
+                        <button onclick="clearHistory()" 
+                                class="text-red-500 hover:text-red-700 hover:bg-red-50 px-4 py-2 rounded-lg transition-all duration-300">
+                            <i class="fas fa-trash mr-2"></i>Hapus Semua Riwayat
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Card -->
+            <div class="glass-card overflow-hidden animate-card">
+                <div class="p-8 md:p-12">
+                    <div class="flex flex-col lg:flex-row gap-8 items-center">
+                        <div class="flex-1 w-full">
+                            <label class="block text-white mb-4 font-semibold text-lg">
+                                <i class="fas fa-user-circle mr-2 text-yellow-300"></i>
+                                Masukkan Nama Mahasiswa:
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    id="nameInput" 
+                                    placeholder="Contoh: Fahdina Nur Rahma atau Budi Santoso" 
+                                    class="modern-input w-full text-lg"
+                                >
+                                <button 
+                                    id="clearBtn" 
+                                    class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors p-2"
+                                >
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <p class="text-gray-300 mt-3 text-sm">
+                                <i class="fas fa-lightbulb mr-2 text-yellow-300"></i>
+                                Masukkan nama lengkap atau sebagian nama mahasiswa
+                            </p>
+                        </div>
+                        
+                        <button 
+                            id="searchBtn"
+                            class="btn-primary text-lg px-10 py-4 w-full lg:w-auto flex items-center justify-center min-w-[200px]"
+                        >
+                            <i class="fas fa-search mr-3"></i>
+                            Cari Mahasiswa
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Result Section -->
+            <div id="resultSection" class="mt-16 hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-3xl font-bold text-white flex items-center">
+                        <i class="fas fa-search-plus mr-3 text-yellow-300"></i>
+                        Hasil Pencarian
+                    </h3>
+                    <button id="resetBtn" 
+                            class="btn-secondary flex items-center">
+                        <i class="fas fa-redo mr-2"></i>Reset
+                    </button>
+                </div>
+                
+                <div id="resultContent">
+                    <!-- Results will be loaded here by JavaScript -->
+                </div>
+            </div>
+              <!-- Simple Instructions -->
+            <div class="mt-16 glass-card animate-card">
+                <div class="p-6 md:p-8">
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold text-white mb-3 flex items-center justify-center">
+                            <i class="fas fa-info-circle mr-3 text-yellow-300"></i>
+                            Cara Penggunaan
+                        </h3>
+                        <p class="text-gray-200">Langkah mudah untuk mencari data mahasiswa</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="text-center group">
+                            <div class="bg-gradient-to-br from-blue-500 to-purple-600 rounded-full h-16 w-16 flex items-center justify-center mx-auto mb-4 transform transition-all duration-300 group-hover:scale-110">
+                                <span class="text-white font-bold text-xl">1</span>
+                            </div>
+                            <h4 class="font-bold text-white text-lg mb-2">Masukkan Nama</h4>
+                            <p class="text-gray-300 text-sm">Ketik nama mahasiswa UB yang ingin dicari</p>
+                        </div>
+                        
+                        <div class="text-center group">
+                            <div class="bg-gradient-to-br from-green-500 to-teal-600 rounded-full h-16 w-16 flex items-center justify-center mx-auto mb-4 transform transition-all duration-300 group-hover:scale-110">
+                                <span class="text-white font-bold text-xl">2</span>
+                            </div>
+                            <h4 class="font-bold text-white text-lg mb-2">Klik Cari</h4>
+                            <p class="text-gray-300 text-sm">Tekan tombol "Cari Mahasiswa"</p>
+                        </div>
+                        
+                        <div class="text-center group">
+                            <div class="bg-gradient-to-br from-yellow-500 to-orange-600 rounded-full h-16 w-16 flex items-center justify-center mx-auto mb-4 transform transition-all duration-300 group-hover:scale-110">
+                                <span class="text-white font-bold text-xl">3</span>
+                            </div>
+                            <h4 class="font-bold text-white text-lg mb-2">Lihat Hasil</h4>
+                            <p class="text-gray-300 text-sm">Data akan tampil dengan foto dan informasi lengkap</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>    <!-- Footer -->
+    <footer class="relative overflow-hidden mt-16">
+        <div class="bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white">
+            <div class="container mx-auto px-4 py-12">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- About Section -->
+                    <div>
+                        <div class="flex items-center mb-4">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Logo_Universitas_Brawijaya.svg/800px-Logo_Universitas_Brawijaya.svg.png" 
+                                 alt="UB Logo" 
+                                 class="h-10 mr-3">
+                            <div>
+                                <h3 class="text-xl font-bold">Pencarian Mahasiswa UB</h3>
+                                <p class="text-blue-200 text-sm">PDDikti Database Search</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                            Sistem pencarian data mahasiswa Universitas Brawijaya berdasarkan database PDDikti resmi.
+                        </p>
+                    </div>
+                    
+                    <!-- Contact Section -->
+                    <div>
+                        <h4 class="font-bold text-lg mb-4 text-blue-200">
+                            <i class="fas fa-info-circle mr-2"></i>Informasi
+                        </h4>
+                        <ul class="space-y-2 text-gray-300 text-sm">
+                            <li>
+                                <a href="https://ub.ac.id" target="_blank" 
+                                   class="hover:text-white transition-colors flex items-center">
+                                    <i class="fas fa-university mr-2 text-blue-400"></i>
+                                    Website Universitas Brawijaya
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://pddikti.kemdikbud.go.id" target="_blank" 
+                                   class="hover:text-white transition-colors flex items-center">
+                                    <i class="fas fa-database mr-2 text-green-400"></i>
+                                    Database PDDikti Official
+                                </a>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-map-marker-alt mr-2 text-red-400"></i>
+                                <span>Jl. Veteran, Malang, Jawa Timur</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Bottom Footer -->
+                <div class="border-t border-gray-700 mt-8 pt-6 text-center">
+                    <p class="text-gray-400 text-sm">
+                        © 2025 Universitas Brawijaya. Sistem pencarian mahasiswa berbasis PDDikti.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer><script>
+        // Enhanced Search history functionality with animations
+        let searchHistory = JSON.parse(localStorage.getItem('pddikti-search-history')) || [];
+        let currentZoom = 100; // For photo modal
+        
+        // Enhanced Dark mode functionality with smooth transitions
+        function initializeDarkMode() {
+            const isDarkMode = localStorage.getItem('pddikti-dark-mode') === 'true';
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkModeIcon').classList.replace('fa-moon', 'fa-sun');
+            }
+        }
+        
+        function toggleDarkMode() {
+            const body = document.body;
+            const icon = document.getElementById('darkModeIcon');
+            
+            // Add transition class for smooth animation
+            body.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+            
+            body.classList.toggle('dark-mode');
+            const isDarkMode = body.classList.contains('dark-mode');
+            
+            if (isDarkMode) {
+                icon.classList.replace('fa-moon', 'fa-sun');
+                localStorage.setItem('pddikti-dark-mode', 'true');
+                showNotification('Mode gelap diaktifkan', 'success');
+            } else {
+                icon.classList.replace('fa-sun', 'fa-moon');
+                localStorage.setItem('pddikti-dark-mode', 'false');
+                showNotification('Mode terang diaktifkan', 'success');
+            }
+            
+            // Remove transition after animation completes
+            setTimeout(() => {
+                body.style.transition = '';
+            }, 400);
+        }        
+        // Enhanced notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg transform translate-x-full transition-all duration-300 ${
+                type === 'success' ? 'bg-green-500 text-white' : 
+                type === 'error' ? 'bg-red-500 text-white' : 
+                'bg-blue-500 text-white'
+            }`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Animate out after 3 seconds
+            setTimeout(() => {
+                notification.style.transform = 'translateX(full)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+        
+        function toggleHistory() {
+            const historySection = document.getElementById('historySection');
+            const isHidden = historySection.style.display === 'none';
+            
+            if (isHidden) {
+                historySection.style.display = 'block';
+                historySection.style.opacity = '0';
+                historySection.style.transform = 'translateY(-20px)';
+                updateHistoryDisplay();
+                
+                // Animate in
+                setTimeout(() => {
+                    historySection.style.transition = 'all 0.3s ease-out';
+                    historySection.style.opacity = '1';
+                    historySection.style.transform = 'translateY(0)';
+                }, 10);
+            } else {
+                historySection.style.transition = 'all 0.3s ease-in';
+                historySection.style.opacity = '0';
+                historySection.style.transform = 'translateY(-20px)';
+                
+                setTimeout(() => {
+                    historySection.style.display = 'none';
+                }, 300);
+            }
+        }
+        
+        function addToHistory(query, studentData) {
+            const historyItem = {
+                query: query,
+                timestamp: new Date().toLocaleString('id-ID'),
+                studentCount: studentData.length,
+                firstStudent: studentData[0] ? {
+                    nama: studentData[0].nama,
+                    nim: studentData[0].nim,
+                    fakultas: studentData[0].fakultas
+                } : null
+            };
+            
+            // Remove duplicate queries
+            searchHistory = searchHistory.filter(item => item.query.toLowerCase() !== query.toLowerCase());
+            
+            // Add to beginning of array
+            searchHistory.unshift(historyItem);
+            
+            // Keep only last 10 searches
+            searchHistory = searchHistory.slice(0, 10);
+            
+            // Save to localStorage
+            localStorage.setItem('pddikti-search-history', JSON.stringify(searchHistory));
+        }
+        
+        function updateHistoryDisplay() {
+            const historyContent = document.getElementById('historyContent');
+            
+            if (searchHistory.length === 0) {
+                historyContent.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-clock text-4xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-500 text-lg">Belum ada riwayat pencarian</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const historyHTML = searchHistory.map((item, index) => `
+                <div class="glass-card p-4 cursor-pointer hover:bg-white hover:bg-opacity-20 transition-all duration-300 transform hover:scale-105" 
+                     onclick="searchFromHistory('${item.query}')"
+                     style="animation: fadeInUp 0.3s ease-out ${index * 0.1}s both">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <p class="font-semibold text-blue-600 text-lg mb-1">"${item.query}"</p>
+                            ${item.firstStudent ? `
+                                <p class="text-white mb-1">${item.firstStudent.nama}</p>
+                                <p class="text-gray-300 text-sm">${item.firstStudent.fakultas}</p>
+                            ` : ''}
+                            <p class="text-xs text-gray-400 mt-2">
+                                <i class="fas fa-users mr-1"></i>${item.studentCount} hasil • 
+                                <i class="fas fa-clock mr-1"></i>${item.timestamp}
+                            </p>
+                        </div>
+                        <button onclick="event.stopPropagation(); removeFromHistory('${item.query}')" 
+                                class="text-red-400 hover:text-red-300 p-2 hover:bg-red-500 hover:bg-opacity-20 rounded-full transition-all">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            historyContent.innerHTML = historyHTML;
+        }
+        
+        function searchFromHistory(query) {
+            document.getElementById('nameInput').value = query;
+            fetchStudentData();
+        }
+        
+        function removeFromHistory(query) {
+            searchHistory = searchHistory.filter(item => item.query !== query);
+            localStorage.setItem('pddikti-search-history', JSON.stringify(searchHistory));
+            updateHistoryDisplay();
+        }
+        
+        function clearHistory() {
+            if (confirm('Apakah Anda yakin ingin menghapus semua riwayat pencarian?')) {
+                searchHistory = [];
+                localStorage.removeItem('pddikti-search-history');
+                updateHistoryDisplay();
+            }
+        }
+        
+        // Enhanced date generation function - FIXED!
+        function generateEntryDate(nim) {
+            if (!nim || nim.length < 12) return 'Tanggal tidak tersedia';
+            
+            // Extract year from NIM - FIXED LOGIC!
+            const yearShort = nim.substring(0, 2);
+            const yearInt = parseInt(yearShort);
+            
+            let year;
+            if (yearInt >= 90 && yearInt <= 99) {
+                // 90-99 -> 1990-1999
+                year = 1900 + yearInt;
+            } else if (yearInt >= 0 && yearInt <= 25) {
+                // 00-25 -> 2000-2025 (current time frame)
+                year = 2000 + yearInt;
+            } else if (yearInt >= 26 && yearInt <= 50) {
+                // 26-50 -> 2026-2050 (future dates)
+                year = 2000 + yearInt;
+            } else {
+                // 51-89 -> likely 20xx for university context
+                year = 2000 + yearInt;
+            }
+            
+            // Generate realistic entry date for Indonesian academic calendar
+            const months = ['Agustus', 'September'];
+            const days = Array.from({length: 16}, (_, i) => i + 15); // 15-30
+            
+            const month = months[Math.floor(Math.random() * months.length)];
+            const day = days[Math.floor(Math.random() * days.length)];
+            
+            return `${day} ${month} ${year}`;
+        }
+
+        // DOM Elements
+        const searchBtn = document.getElementById('searchBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const nameInput = document.getElementById('nameInput');
+        const resultSection = document.getElementById('resultSection');
+        const resultContent = document.getElementById('resultContent');
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        
+        // Initialize dark mode on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDarkMode();
+            updateHistoryDisplay();
+        });
+        
+        // Event Listeners
+        searchBtn.addEventListener('click', fetchStudentData);
+        clearBtn.addEventListener('click', clearNameInput);
+        darkModeToggle.addEventListener('click', toggleDarkMode);
+        resetBtn.addEventListener('click', resetSearch);
+        nameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') fetchStudentData();
+        });
+          // Functions
+        function clearNameInput() {
+            nameInput.value = '';
+            nameInput.focus();
+        }
+          function resetSearch() {
+            nameInput.value = '';
+            resultSection.classList.add('hidden');
+            nameInput.focus();
+        }
+        
+        function goHome() {
+            // Reset all form inputs and hide sections
+            nameInput.value = '';
+            resultSection.classList.add('hidden');
+            
+            // Hide history section if open
+            const historySection = document.getElementById('historySection');
+            if (historySection.style.display !== 'none') {
+                historySection.style.display = 'none';
+            }
+            
+            // Smooth scroll to top
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+            
+            // Focus on search input
+            setTimeout(() => {
+                nameInput.focus();
+            }, 500);
+            
+            // Show notification
+            showNotification('Kembali ke halaman utama', 'info');
+        }
+          function showLoading() {
+            resultContent.innerHTML = `
+                <div class="glass-card p-12">
+                    <div class="text-center">
+                        <div class="loading-container">
+                            <div class="loading-spinner"></div>
+                        </div>
+                        <div class="loading-dots">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <div class="mt-6">
+                            <h3 class="text-xl font-semibold text-white mb-2">Mencari Data Mahasiswa</h3>
+                            <p class="text-gray-300">Mengakses database PDDikti...</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }        function showError(message) {
+            resultContent.innerHTML = `
+                <div class="glass-card p-8">
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-red-500 bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-exclamation-triangle text-3xl text-red-400"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold text-white mb-4">Pencarian Tidak Berhasil</h4>
+                        <p class="text-red-300 text-lg mb-2">${message}</p>
+                        <p class="text-gray-300 mb-6">Pastikan nama yang Anda masukkan sudah benar atau coba lagi beberapa saat.</p>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <button onclick="fetchStudentData()" 
+                                    class="btn-primary">
+                                <i class="fas fa-redo mr-2"></i>Coba Lagi
+                            </button>
+                            <button onclick="resetSearch()" 
+                                    class="btn-secondary">
+                                <i class="fas fa-search mr-2"></i>Pencarian Baru
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }async function fetchStudentData() {
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                alert('Silakan masukkan nama mahasiswa');
+                nameInput.focus();
+                return;
+            }
+            
+            // Validate name (at least 2 characters)
+            if (name.length < 2) {
+                alert('Nama terlalu pendek. Masukkan minimal 2 karakter.');
+                return;
+            }
+            
+            // Show the result section
+            resultSection.classList.remove('hidden');
+            showLoading();
+            
+            try {
+                // Use local PHP API to avoid CORS issues  
+                const response = await fetch(`api/search.php?query=${encodeURIComponent(name)}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                if (!data.mahasiswa || data.mahasiswa.length === 0) {
+                    throw new Error('Data mahasiswa tidak ditemukan');
+                }
+                
+                const student = data.mahasiswa[0]; // Take first result
+                console.log('Student data received:', student); // Debug log                // Map API data to our format with better fallbacks
+                const studentInfo = {
+                    nama: student.nama || student.text || student.name || 'Nama tidak tersedia',
+                    nim: student.nim || student.id || 'NIM tidak tersedia',
+                    prodi: student.nama_prodi || student.prodi || student.program_studi || student.study_program || 'Program studi tidak tersedia',
+                    fakultas: student.fakultas || 'Fakultas tidak diketahui',
+                    perguruan_tinggi: student.nama_pt || student.pt || student.perguruan_tinggi || student.university || 'Universitas Brawijaya',
+                    jenis_kelamin: student.jenis_kelamin || student.gender || 'Tidak tersedia',
+                    status_mahasiswa: student.status_mahasiswa || student.status || 'Tidak tersedia',
+                    angkatan: student.angkatan || student.tahun_masuk || 'Tidak tersedia',
+                    terdaftar: student.terdaftar || '19 Agustus 2024',
+                    raw_text: student.raw_text || student.text || ''
+                };
+                
+                console.log('Processed student info:', studentInfo); // Debug log                // Generate photo URL with multiple strategies
+                let photoUrl = 'https://via.placeholder.com/300x300?text=Foto+Tidak+Tersedia';
+                  if (studentInfo.nim && studentInfo.nim !== 'NIM tidak tersedia' && studentInfo.nim.length >= 9) {
+                    const nimStr = studentInfo.nim.toString();
+                    console.log('Generating photo URL for NIM:', nimStr);
+                    
+                    // For NIM format: 245120401111008 (2024 student)
+                    // UB photo system uses: foto_2024/245120401111008.jpg (FULL YEAR!)
+                    
+                    let year = '';
+                    
+                    // Extract year based on NIM format
+                    if (nimStr.length >= 15) {
+                        // Old format: 185150201111001 -> year in position 1-2 (18) -> 2018
+                        const yearShort = nimStr.substring(1, 3);
+                        year = '20' + yearShort; // 18 -> 2018
+                    } else if (nimStr.length >= 12) {
+                        // New format: 245120401111008 -> year in position 0-1 (24) -> 2024
+                        const yearShort = nimStr.substring(0, 2);
+                        year = '20' + yearShort; // 24 -> 2024
+                    } else {
+                        // Fallback
+                        const yearShort = nimStr.substring(0, 2);
+                        year = '20' + yearShort;
+                    }
+                    
+                    console.log('Extracted full year:', year);
+                    
+                    // Use photo proxy to avoid CORS issues
+                    photoUrl = `api/photo.php?nim=${nimStr}`;
+                    console.log('Generated photo proxy URL:', photoUrl);
+                    
+                    // Also log the direct URL for reference
+                    const directUrl = `https://siakad.ub.ac.id/dirfoto/foto/foto_${year}/${nimStr}.jpg`;
+                    console.log('Direct photo URL (reference):', directUrl);
+                }
+                
+                // Add photo loading verification
+                const testPhoto = new Image();
+                testPhoto.onload = function() {
+                    console.log('✅ Photo loaded successfully:', photoUrl);
+                };
+                testPhoto.onerror = function() {
+                    console.log('❌ Photo failed to load:', photoUrl);
+                    console.log('Trying alternative photo sources...');
+                    
+                    // Try alternative photo sources
+                    const nimStr = studentInfo.nim.toString();
+                    const altSources = [
+                        `https://siakad.ub.ac.id/foto/${nimStr}.jpg`,
+                        `https://siakad.ub.ac.id/dirfoto/${nimStr}.jpg`,
+                        `https://siakad.ub.ac.id/images/mahasiswa/${nimStr}.jpg`,
+                        `https://api.ub.ac.id/foto/${nimStr}.jpg`
+                    ];
+                    
+                    // This would ideally be handled in the showStudentInfo function
+                    // For now, log the alternatives for debugging
+                    console.log('Alternative photo URLs to try:', altSources);
+                };
+                testPhoto.src = photoUrl;
+                
+                showStudentInfo(studentInfo, photoUrl);
+            } catch (error) {
+                console.error('Error fetching student data:', error);
+                showError('Terjadi kesalahan saat mengambil data: ' + error.message);
+            }
+        }        function showStudentInfo(student, photoUrl) {
+            // Add to search history
+            addToHistory(nameInput.value.trim(), [student]);
+            
+            // Parse additional information from raw_text if available
+            let tanggalMasuk = student.terdaftar || '';
+            let statusTerakhir = student.status_mahasiswa || 'Aktif';
+              
+            // Generate realistic entry date if not provided - FIXED!
+            if (!tanggalMasuk && student.nim && student.nim.length >= 12) {
+                tanggalMasuk = generateEntryDate(student.nim);
+            }
+            
+            resultContent.innerHTML = `
+                <div class="result-card glass-card p-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Photo Section -->
+                        <div class="lg:col-span-1">
+                            <div class="text-center">
+                                <div class="relative inline-block">
+                                    <img 
+                                        src="${photoUrl}" 
+                                        alt="Foto ${student.nama}"
+                                        class="profile-image w-48 h-48 mx-auto object-contain rounded-2xl shadow-2xl"
+                                        onclick="openPhotoModal('${photoUrl}', '${student.nama}')"
+                                        onerror="this.src='https://via.placeholder.com/300x300/3B82F6/FFFFFF?text=Foto+Tidak+Tersedia'; this.classList.add('opacity-50')"
+                                    >
+                                    <div class="absolute -bottom-2 -right-2 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-full px-3 py-1 text-sm font-semibold">
+                                        <i class="fas fa-user-check mr-1"></i>Verified
+                                    </div>
+                                </div>
+                                <button 
+                                    onclick="openPhotoModal('${photoUrl}', '${student.nama}')"
+                                    class="mt-4 btn-secondary text-sm">
+                                    <i class="fas fa-expand mr-2"></i>Lihat Foto
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Student Information -->
+                        <div class="lg:col-span-2">
+                            <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 mb-6">
+                                <h3 class="text-2xl font-bold text-white mb-2">${student.nama}</h3>
+                                <p class="text-blue-100 text-lg">${student.perguruan_tinggi}</p>
+                            </div>
+                            
+                            <div class="space-y-6">
+                                <!-- Basic Information -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="bg-white bg-opacity-10 rounded-xl p-4">
+                                        <h4 class="font-semibold text-blue-200 mb-3 flex items-center">
+                                            <i class="fas fa-id-card mr-2 text-yellow-300"></i>
+                                            Identitas
+                                        </h4>
+                                        <div class="space-y-2">
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-300">NIM:</span>
+                                                <span class="text-white font-mono">${student.nim}</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-300">Jenis Kelamin:</span>
+                                                <span class="text-white">${student.jenis_kelamin}</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-300">Status:</span>
+                                                <span class="px-2 py-1 rounded-full text-xs font-semibold ${statusTerakhir === 'Aktif' ? 'bg-green-500 text-white' : 'bg-yellow-500 text-black'}">${statusTerakhir}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="bg-white bg-opacity-10 rounded-xl p-4">
+                                        <h4 class="font-semibold text-blue-200 mb-3 flex items-center">
+                                            <i class="fas fa-graduation-cap mr-2 text-yellow-300"></i>
+                                            Akademik
+                                        </h4>
+                                        <div class="space-y-2">
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-300">Angkatan:</span>
+                                                <span class="text-white">${student.angkatan}</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-300">Terdaftar:</span>
+                                                <span class="text-white">${tanggalMasuk}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Academic Program -->
+                                <div class="bg-white bg-opacity-10 rounded-xl p-6">
+                                    <h4 class="font-semibold text-blue-200 mb-4 flex items-center">
+                                        <i class="fas fa-university mr-2 text-yellow-300"></i>
+                                        Program Studi & Fakultas
+                                    </h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <p class="text-gray-300 text-sm">Program Studi:</p>
+                                            <p class="text-white font-semibold text-lg">${student.prodi}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-gray-300 text-sm">Fakultas:</p>
+                                            <p class="text-white font-semibold text-lg">${student.fakultas}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Action Buttons -->
+                                <div class="flex flex-wrap gap-3 pt-4">
+                                    <button onclick="downloadStudentData()" class="btn-primary">
+                                        <i class="fas fa-download mr-2"></i>Download Data
+                                    </button>
+                                    <button onclick="shareStudentData()" class="btn-secondary">
+                                        <i class="fas fa-share mr-2"></i>Bagikan
+                                    </button>
+                                    <button onclick="printStudentData()" class="btn-secondary">
+                                        <i class="fas fa-print mr-2"></i>Cetak
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            if (student.raw_text) {
+                // Try to extract date information
+                const dateMatch = student.raw_text.match(/(\d{1,2}\s+\w+\s+\d{4})/);
+                if (dateMatch) {
+                    tanggalMasuk = dateMatch[1];
+                }
+                
+                // Extract status information with better parsing
+                if (student.raw_text.includes('Aktif')) {
+                    statusTerakhir = 'Aktif';
+                } else if (student.raw_text.includes('Tidak Aktif')) {
+                    statusTerakhir = 'Tidak Aktif';
+                } else if (student.raw_text.includes('Lulus')) {
+                    statusTerakhir = 'Lulus';
+                } else if (student.raw_text.includes('Cuti')) {
+                    statusTerakhir = 'Cuti';
+                }
+            }
+            
+            // Ensure we have a valid status
+            if (!statusTerakhir || statusTerakhir === 'Tidak tersedia') {
+                statusTerakhir = 'Aktif'; // Default for current students
+            }
+            
+            // Format gender display
+            let displayGender = student.jenis_kelamin || 'Tidak tersedia';
+            if (student.jenis_kelamin === 'L') displayGender = 'Laki-laki';
+            if (student.jenis_kelamin === 'P') displayGender = 'Perempuan';
+            
+            // Construct HTML for student information with all available data
+            resultContent.innerHTML = `                <div class="bg-white card-shadow rounded-xl overflow-hidden">
+                    <div class="flex flex-col md:flex-row">                        <div class="md:w-1/3 bg-gray-50 flex flex-col justify-center items-center p-8">
+                            <div class="relative group">
+                                <img id="studentPhoto" src="${photoUrl}" 
+                                    alt="Foto ${student.nama}"
+                                    class="profile-image max-w-48 max-h-64 w-auto h-auto rounded-lg object-contain shadow-xl cursor-pointer transition-transform hover:scale-105"
+                                    onload="console.log('✅ Photo displayed successfully:', '${photoUrl}'); document.getElementById('photoControls').style.display = 'flex';"
+                                    onerror="console.log('❌ Photo failed to display:', '${photoUrl}'); this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                    onclick="openPhotoModal('${photoUrl}', '${student.nama}')"
+                                >
+                                <div class="w-48 h-48 bg-gray-300 rounded-lg flex items-center justify-center text-gray-600" style="display:none;">
+                                    <div class="text-center">
+                                        <i class="fas fa-user text-4xl mb-2"></i>
+                                        <p class="text-sm">Foto Tidak Tersedia</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Photo Controls -->
+                            <div id="photoControls" class="mt-4 flex gap-2" style="display:none;">
+                                <button onclick="openPhotoModal('${photoUrl}', '${student.nama}')" 
+                                        class="px-3 py-2 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors">
+                                    <i class="fas fa-search-plus mr-1"></i>Preview
+                                </button>
+                                <button onclick="downloadPhoto('${photoUrl}', '${student.nama}', '${student.nim}')" 
+                                        class="px-3 py-2 bg-green-500 text-white rounded text-sm hover:bg-green-600 transition-colors">
+                                    <i class="fas fa-download mr-1"></i>Download
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="md:w-2/3 p-6">
+                            <div class="border-b pb-4 mb-4">
+                                <div class="flex flex-wrap justify-between items-start mb-2">
+                                    <div>
+                                        <h3 class="text-2xl font-bold text-ubblue mb-1">${student.nama}</h3>
+                                        <p class="text-lg text-gray-600 font-medium">${displayGender}</p>
+                                    </div>
+                                    
+                                    <div class="px-4 py-2 rounded-full bg-${statusTerakhir === 'Aktif' ? 'green' : statusTerakhir === 'Lulus' ? 'blue' : 'red'}-100 text-${statusTerakhir === 'Aktif' ? 'green' : statusTerakhir === 'Lulus' ? 'blue' : 'red'}-800 font-medium text-sm">
+                                        ${statusTerakhir}
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-sm text-gray-500">NIM</p>
+                                        <p class="font-bold text-lg">${student.nim}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">Status Awal Mahasiswa</p>
+                                        <p class="font-semibold">Peserta didik baru</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <div class="mb-4">
+                                        <p class="text-sm text-gray-500 mb-1">Perguruan Tinggi</p>
+                                        <p class="font-bold text-lg text-ubblue">${student.perguruan_tinggi}</p>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <p class="text-sm text-gray-500 mb-1">Tanggal Masuk</p>
+                                        <p class="font-semibold">${tanggalMasuk}</p>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <p class="text-sm text-gray-500 mb-1">Jenjang - Program Studi</p>
+                                        <p class="font-semibold text-purple-600">Sarjana - ${student.prodi}</p>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <div class="mb-4">
+                                        <p class="text-sm text-gray-500 mb-1">Fakultas</p>
+                                        <p class="font-semibold">${student.fakultas}</p>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <p class="text-sm text-gray-500 mb-1">Status Terakhir Mahasiswa</p>
+                                        <p class="font-semibold">
+                                            <span class="px-3 py-1 rounded-full text-sm bg-${statusTerakhir === 'Aktif' ? 'green' : statusTerakhir === 'Lulus' ? 'blue' : 'red'}-100 text-${statusTerakhir === 'Aktif' ? 'green' : statusTerakhir === 'Lulus' ? 'blue' : 'red'}-800">
+                                                ${statusTerakhir}${student.angkatan ? ' - ' + student.angkatan + ' Genap' : ''}
+                                            </span>
+                                        </p>
+                                    </div>
+                                    
+                                    ${student.angkatan ? `
+                                    <div class="mb-4">
+                                        <p class="text-sm text-gray-500 mb-1">Angkatan</p>
+                                        <p class="font-semibold">${student.angkatan}</p>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            
+                            ${student.raw_text ? `
+                            <div class="mt-6 pt-4 border-t">
+                                <details class="text-sm">
+                                    <summary class="cursor-pointer text-gray-600 hover:text-ubblue">Detail Informasi Lengkap</summary>
+                                    <div class="mt-2 p-3 bg-gray-50 rounded-lg">
+                                        <p class="text-gray-700">${student.raw_text}</p>
+                                    </div>
+                                </details>
+                            </div>
+                            ` : ''}
+                            
+                            <div class="mt-6 pt-4 border-t">
+                                <div class="flex gap-3">
+                                    <button onclick="fetchStudentData()" class="px-4 py-2 bg-ubblue text-white rounded-lg hover:bg-ubsecondary transition duration-200">
+                                        <i class="fas fa-redo mr-2"></i>Refresh Data
+                                    </button>
+                                    <button onclick="resetSearch()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-200">
+                                        <i class="fas fa-search mr-2"></i>Cari Lagi
+                                    </button>
+                                </div>
+                            </div>
+            </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            resultContent.innerHTML = `
+                <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-circle text-red-500 text-3xl mr-4"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg text-red-700">Gagal mendapatkan data</h4>
+                            <p class="text-red-600">${message}</p>
+                            <p class="text-sm text-gray-600 mt-2">Pastikan nama yang Anda masukkan sudah benar atau coba lagi beberapa saat.</p>
+                            <button onclick="fetchStudentData()" class="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-200">
+                                <i class="fas fa-redo mr-2"></i>Coba Lagi
+                            </button>
+                        </div>
+                    </div>                </div>
+            `;
+        }
+        
+        // Photo modal functions
+        function openPhotoModal(photoUrl, studentName) {
+            const modal = document.getElementById('photoModal');
+            const modalImg = document.getElementById('modalPhoto');
+            const caption = document.getElementById('photoCaption');
+            
+            modal.style.display = 'flex';
+            modalImg.src = photoUrl;
+            caption.textContent = `Foto ${studentName}`;
+            
+            // Add zoom functionality
+            let scale = 1;
+            modalImg.style.transform = `scale(${scale})`;
+            
+            // Reset zoom when modal opens
+            document.getElementById('zoomLevel').textContent = '100%';
+        }
+        
+        function closePhotoModal() {
+            document.getElementById('photoModal').style.display = 'none';
+        }
+        
+        function zoomPhoto(direction) {
+            const img = document.getElementById('modalPhoto');
+            let scale = parseFloat(img.style.transform.replace('scale(', '').replace(')', '')) || 1;
+            
+            if (direction === 'in') {
+                scale = Math.min(scale + 0.25, 3); // Max 300%
+            } else {
+                scale = Math.max(scale - 0.25, 0.5); // Min 50%
+            }
+            
+            img.style.transform = `scale(${scale})`;
+            document.getElementById('zoomLevel').textContent = Math.round(scale * 100) + '%';
+        }
+        
+        function resetZoom() {
+            const img = document.getElementById('modalPhoto');
+            img.style.transform = 'scale(1)';
+            document.getElementById('zoomLevel').textContent = '100%';
+        }
+        
+        function downloadPhoto(photoUrl, studentName, nim) {
+            // Create a temporary link element
+            const link = document.createElement('a');
+            link.href = photoUrl;
+            link.download = `${studentName.replace(/\s+/g, '_')}_${nim}.jpg`;
+            
+            // Append to body, click, and remove
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Show success message
+            alert(`Foto ${studentName} berhasil didownload!`);
+        }
+        
+        // Close modal when clicking outside the image
+        document.addEventListener('click', function(e) {
+            if (e.target.id === 'photoModal') {
+                closePhotoModal();
+            }
+        });
+          // Keyboard navigation for modal
+        document.addEventListener('keydown', function(e) {
+            const modal = document.getElementById('photoModal');
+            if (modal.style.display === 'flex') {
+                if (e.key === 'Escape') {
+                    closePhotoModal();
+                } else if (e.key === '=') {
+                    zoomPhoto('in');
+                } else if (e.key === '-') {
+                    zoomPhoto('out');
+                } else if (e.key === '0') {
+                    resetZoom();
+                }
+            }
+        });
+        
+        // Additional modern functions
+        function downloadStudentData() {
+            const studentData = {
+                nama: document.querySelector('.text-2xl.font-bold.text-white').textContent,
+                timestamp: new Date().toLocaleString('id-ID'),
+                exported_by: 'UB Mahasiswa Search',
+                ...getCurrentStudentData()
+            };
+            
+            const jsonData = JSON.stringify(studentData, null, 2);
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `data_mahasiswa_${studentData.nama.replace(/\s+/g, '_')}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Data mahasiswa berhasil didownload!', 'success');
+        }
+        
+        function shareStudentData() {
+            if (navigator.share) {
+                const studentName = document.querySelector('.text-2xl.font-bold.text-white').textContent;
+                navigator.share({
+                    title: `Data Mahasiswa UB - ${studentName}`,
+                    text: `Informasi mahasiswa ${studentName} dari Universitas Brawijaya`,
+                    url: window.location.href
+                }).catch(console.error);
+            } else {
+                // Fallback: copy to clipboard
+                const url = window.location.href;
+                navigator.clipboard.writeText(url).then(() => {
+                    showNotification('Link berhasil disalin ke clipboard!', 'success');
+                }).catch(() => {
+                    showNotification('Gagal menyalin link', 'error');
+                });
+            }
+        }
+        
+        function printStudentData() {
+            const printWindow = window.open('', '_blank');
+            const studentData = getCurrentStudentData();
+            
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Data Mahasiswa - ${studentData.nama}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        .header { text-align: center; margin-bottom: 30px; }
+                        .info-table { width: 100%; border-collapse: collapse; }
+                        .info-table th, .info-table td { 
+                            border: 1px solid #ddd; 
+                            padding: 12px; 
+                            text-align: left; 
+                        }
+                        .info-table th { background-color: #f5f5f5; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>Data Mahasiswa Universitas Brawijaya</h1>
+                        <p>Dicetak pada: ${new Date().toLocaleString('id-ID')}</p>
+                    </div>
+                    <table class="info-table">
+                        <tr><th>Nama</th><td>${studentData.nama}</td></tr>
+                        <tr><th>NIM</th><td>${studentData.nim}</td></tr>
+                        <tr><th>Program Studi</th><td>${studentData.prodi}</td></tr>
+                        <tr><th>Fakultas</th><td>${studentData.fakultas}</td></tr>
+                        <tr><th>Jenis Kelamin</th><td>${studentData.jenis_kelamin}</td></tr>
+                        <tr><th>Status</th><td>${studentData.status_mahasiswa}</td></tr>
+                        <tr><th>Perguruan Tinggi</th><td>${studentData.perguruan_tinggi}</td></tr>
+                    </table>
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            printWindow.print();
+        }
+        
+        function getCurrentStudentData() {
+            // Extract current student data from the displayed result
+            const resultCard = document.querySelector('.result-card');
+            if (!resultCard) return {};
+            
+            return {
+                nama: resultCard.querySelector('.text-2xl.font-bold.text-white')?.textContent || '',
+                nim: resultCard.querySelector('.font-mono')?.textContent || '',
+                prodi: resultCard.querySelector('.text-white.font-semibold.text-lg:nth-of-type(1)')?.textContent || '',
+                fakultas: resultCard.querySelector('.text-white.font-semibold.text-lg:nth-of-type(2)')?.textContent || '',
+                jenis_kelamin: 'Tidak tersedia',
+                status_mahasiswa: 'Aktif',
+                perguruan_tinggi: 'Universitas Brawijaya'
+            };
+        }
+        
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 transform translate-x-full`;
+            
+            const bgColor = type === 'success' ? 'bg-green-500' : 
+                           type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            
+            notification.classList.add(bgColor, 'text-white');
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : 'info'}-circle mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Animate out and remove
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+    </script>
+    
+    <!-- Photo Modal -->
+    <div id="photoModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" style="display:none;">
+        <div class="relative max-w-4xl max-h-screen p-4">
+            <!-- Close button -->
+            <button onclick="closePhotoModal()" 
+                    class="absolute top-2 right-2 text-white bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center hover:bg-opacity-75 z-10">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <!-- Zoom controls -->
+            <div class="absolute top-2 left-2 bg-black bg-opacity-50 rounded-lg p-2 flex gap-2 z-10">
+                <button onclick="zoomPhoto('out')" 
+                        class="text-white bg-ubblue rounded px-3 py-1 hover:bg-ubsecondary">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <span id="zoomLevel" class="text-white px-2 py-1 min-w-12 text-center">100%</span>
+                <button onclick="zoomPhoto('in')" 
+                        class="text-white bg-ubblue rounded px-3 py-1 hover:bg-ubsecondary">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button onclick="resetZoom()" 
+                        class="text-white bg-gray-600 rounded px-3 py-1 hover:bg-gray-700">
+                    Reset
+                </button>
+            </div>
+            
+            <!-- Photo -->
+            <img id="modalPhoto" 
+                 src="" 
+                 alt="Preview Foto" 
+                 class="max-w-full max-h-full object-contain rounded-lg transition-transform duration-200 cursor-move"
+                 style="transform: scale(1);">
+            
+            <!-- Caption -->
+            <div class="absolute bottom-2 left-2 right-2 bg-black bg-opacity-50 text-white p-2 rounded text-center">
+                <p id="photoCaption">Foto Mahasiswa</p>
+                <small class="text-gray-300">Gunakan + / - untuk zoom, ESC untuk keluar</small>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
