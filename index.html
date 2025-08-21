@@ -67,26 +67,6 @@
             overflow-x: hidden;
             position: relative;
         }
-        
-        /* Animated background particles */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.05"><polygon points="30,0 60,30 30,60 0,30"/></g></svg>') repeat;
-            animation: float 20s infinite linear;
-            pointer-events: none;
-            z-index: -1;
-        }
-        
-        @keyframes float {
-            from { transform: translateY(0px); }
-            to { transform: translateY(-60px); }
-        }
-        
         /* Glass morphism effects */
         .glass-card {
             background: var(--glass-bg);
@@ -446,9 +426,66 @@
         .footer-clean {
             margin-top: 3rem;
         }
+
+        /* Google-like minimal layout */
+        body {
+            background: var(--background-primary);
+            color: var(--text-primary);
+        }
+
+        .hero-header {
+            background: var(--background-primary);
+            box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+        }
+
+        .google-card {
+            background: var(--background-primary);
+            border-radius: 24px;
+            box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+            padding: 2rem;
+        }
+
+        .google-input {
+            display: flex;
+            align-items: center;
+            border: 1px solid #dfe1e5;
+            border-radius: 24px;
+            padding: 0.5rem 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .google-input:focus-within {
+            box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+        }
+
+        .google-input input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            background: transparent;
+            color: var(--text-primary);
+        }
+
+        .google-button {
+            background: #f8f9fa;
+            border: 1px solid #f8f9fa;
+            color: #202124;
+            padding: 0.625rem 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .google-button:hover {
+            border-color: #dadce0;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
-<body class="bg-gray-50">    <!-- Header -->
+<body>    <!-- Header -->
     <header class="hero-header relative z-10">
         <div class="relative py-6">
             <div class="container mx-auto px-4">
@@ -460,10 +497,10 @@
                                  class="h-12 mr-4 drop-shadow-lg transition-transform duration-300 hover:scale-110">
                         </div>
                         <div>
-                            <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight">
+                            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
                                 Pencarian Mahasiswa UB
                             </h1>
-                            <p class="text-yellow-300 text-sm md:text-base font-medium">
+                            <p class="text-gray-600 text-sm md:text-base font-medium">
                                 <i class="fas fa-search mr-2"></i>PDDikti Database Search
                             </p>
                         </div>
@@ -478,15 +515,15 @@
                         </button>
                         
                         <!-- History Button -->
-                        <button id="historyBtn" 
-                                class="btn-secondary px-4 py-2 text-sm md:text-base" 
+                        <button id="historyBtn"
+                                class="btn-secondary px-4 py-2 text-sm md:text-base"
                                 onclick="toggleHistory()">
                             <i class="fas fa-history mr-2"></i>Riwayat
                         </button>
                         
                         <!-- Dark Mode Toggle -->
-                        <button id="darkModeToggle" 
-                                class="glass-card p-2 text-white hover:text-yellow-300 transition-all duration-300"
+                        <button id="darkModeToggle"
+                                class="p-2 rounded-full text-gray-600 hover:text-gray-800 transition-colors"
                                 title="Toggle Dark Mode">
                             <i class="fas fa-moon text-lg" id="darkModeIcon"></i>
                         </button>
@@ -494,10 +531,10 @@
                 </div>
                 
                 <!-- Simple Navigation -->
-                <div class="glass-card p-3">
+                <div class="bg-white border border-gray-200 rounded-lg p-3">
                     <nav class="flex items-center justify-center">
                         <div class="text-center">
-                            <p class="text-white text-sm md:text-base">
+                            <p class="text-gray-700 text-sm md:text-base">
                                 <i class="fas fa-info-circle mr-2 text-yellow-300"></i>
                                 Sistem pencarian data mahasiswa berdasarkan nama
                             </p>
@@ -510,10 +547,10 @@
     <main class="container mx-auto px-4 py-12 relative z-10">
         <div class="max-w-6xl mx-auto">            <!-- Hero Section -->
             <div class="text-center mb-12 animate-card">
-                <h2 class="text-3xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+                <h2 class="text-3xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
                     Cari Data Mahasiswa UB
                 </h2>
-                <p class="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed">
+                <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
                     Masukkan nama mahasiswa untuk mencari informasi lengkap dari database PDDikti
                 </p>
                 <div class="mt-6 flex justify-center">
@@ -546,49 +583,34 @@
             </div>
 
             <!-- Search Card -->
-            <div class="glass-card overflow-hidden animate-card">
-                <div class="p-8 md:p-12">
-                    <div class="flex flex-col lg:flex-row gap-8 items-center">
-                        <div class="flex-1 w-full">
-                            <label class="block text-white mb-4 font-semibold text-lg">
-                                <i class="fas fa-user-circle mr-2 text-yellow-300"></i>
-                                Masukkan Nama Mahasiswa:
-                            </label>
-                            <div class="relative">
-                                <input 
-                                    type="text" 
-                                    id="nameInput" 
-                                    placeholder="Contoh: Fahdina Nur Rahma atau Budi Santoso" 
-                                    class="modern-input w-full text-lg"
-                                >
-                                <button 
-                                    id="clearBtn" 
-                                    class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors p-2"
-                                >
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            <p class="text-gray-300 mt-3 text-sm">
-                                <i class="fas fa-lightbulb mr-2 text-yellow-300"></i>
-                                Masukkan nama lengkap atau sebagian nama mahasiswa
-                            </p>
-                        </div>
-                        
-                        <button 
-                            id="searchBtn"
-                            class="btn-primary text-lg px-10 py-4 w-full lg:w-auto flex items-center justify-center min-w-[200px]"
-                        >
-                            <i class="fas fa-search mr-3"></i>
-                            Cari Mahasiswa
-                        </button>
-                    </div>
+            <div class="google-card animate-card">
+                <label class="block mb-6 text-center font-semibold text-lg" style="color: var(--text-primary);">
+                    Masukkan Nama Mahasiswa
+                </label>
+                <div class="google-input">
+                    <i class="fas fa-search mr-2 text-gray-400"></i>
+                    <input
+                        type="text"
+                        id="nameInput"
+                        placeholder="Contoh: Fahdina Nur Rahma atau Budi Santoso"
+                    >
+                    <button id="clearBtn" class="text-gray-400 hover:text-red-500 ml-2">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
+                <div class="text-center">
+                    <button id="searchBtn" class="google-button">Cari Mahasiswa</button>
+                </div>
+                <p class="text-gray-500 mt-4 text-sm text-center">
+                    <i class="fas fa-lightbulb mr-2 text-yellow-300"></i>
+                    Masukkan nama lengkap atau sebagian nama mahasiswa
+                </p>
             </div>
             
             <!-- Result Section -->
             <div id="resultSection" class="mt-16 hidden">
                 <div class="flex justify-between items-center mb-8">
-                    <h3 class="text-3xl font-bold text-white flex items-center">
+                    <h3 class="text-3xl font-bold text-gray-900 flex items-center">
                         <i class="fas fa-search-plus mr-3 text-yellow-300"></i>
                         Hasil Pencarian
                     </h3>
@@ -603,14 +625,14 @@
                 </div>
             </div>
               <!-- Simple Instructions -->
-            <div class="mt-16 glass-card animate-card">
+            <div class="mt-16 bg-white border border-gray-200 rounded-lg animate-card">
                 <div class="p-6 md:p-8">
                     <div class="text-center mb-8">
-                        <h3 class="text-2xl font-bold text-white mb-3 flex items-center justify-center">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3 flex items-center justify-center">
                             <i class="fas fa-info-circle mr-3 text-yellow-300"></i>
                             Cara Penggunaan
                         </h3>
-                        <p class="text-gray-200">Langkah mudah untuk mencari data mahasiswa</p>
+                        <p class="text-gray-600">Langkah mudah untuk mencari data mahasiswa</p>
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -618,24 +640,24 @@
                             <div class="bg-gradient-to-br from-blue-500 to-purple-600 rounded-full h-16 w-16 flex items-center justify-center mx-auto mb-4 transform transition-all duration-300 group-hover:scale-110">
                                 <span class="text-white font-bold text-xl">1</span>
                             </div>
-                            <h4 class="font-bold text-white text-lg mb-2">Masukkan Nama</h4>
-                            <p class="text-gray-300 text-sm">Ketik nama mahasiswa UB yang ingin dicari</p>
+                            <h4 class="font-bold text-gray-900 text-lg mb-2">Masukkan Nama</h4>
+                            <p class="text-gray-600 text-sm">Ketik nama mahasiswa UB yang ingin dicari</p>
                         </div>
                         
                         <div class="text-center group">
                             <div class="bg-gradient-to-br from-green-500 to-teal-600 rounded-full h-16 w-16 flex items-center justify-center mx-auto mb-4 transform transition-all duration-300 group-hover:scale-110">
                                 <span class="text-white font-bold text-xl">2</span>
                             </div>
-                            <h4 class="font-bold text-white text-lg mb-2">Klik Cari</h4>
-                            <p class="text-gray-300 text-sm">Tekan tombol "Cari Mahasiswa"</p>
+                            <h4 class="font-bold text-gray-900 text-lg mb-2">Klik Cari</h4>
+                            <p class="text-gray-600 text-sm">Tekan tombol "Cari Mahasiswa"</p>
                         </div>
                         
                         <div class="text-center group">
                             <div class="bg-gradient-to-br from-yellow-500 to-orange-600 rounded-full h-16 w-16 flex items-center justify-center mx-auto mb-4 transform transition-all duration-300 group-hover:scale-110">
                                 <span class="text-white font-bold text-xl">3</span>
                             </div>
-                            <h4 class="font-bold text-white text-lg mb-2">Lihat Hasil</h4>
-                            <p class="text-gray-300 text-sm">Data akan tampil dengan foto dan informasi lengkap</p>
+                            <h4 class="font-bold text-gray-900 text-lg mb-2">Lihat Hasil</h4>
+                            <p class="text-gray-600 text-sm">Data akan tampil dengan foto dan informasi lengkap</p>
                         </div>
                     </div>
                 </div>
@@ -1147,98 +1169,93 @@
             }
             
             resultContent.innerHTML = `
-                <div class="result-card glass-card p-8">
+                <div class="result-card bg-white border border-gray-200 rounded-xl p-8">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <!-- Photo Section -->
                         <div class="lg:col-span-1">
                             <div class="text-center">
                                 <div class="relative inline-block">
-                                    <img 
-                                        src="${photoUrl}" 
+                                    <img
+                                        src="${photoUrl}"
                                         alt="Foto ${student.nama}"
                                         class="profile-image w-48 h-48 mx-auto object-contain rounded-2xl shadow-2xl"
                                         onclick="openPhotoModal('${photoUrl}', '${student.nama}')"
                                         onerror="this.src='https://via.placeholder.com/300x300/3B82F6/FFFFFF?text=Foto+Tidak+Tersedia'; this.classList.add('opacity-50')"
                                     >
-                                    <div class="absolute -bottom-2 -right-2 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-full px-3 py-1 text-sm font-semibold">
-                                        <i class="fas fa-user-check mr-1"></i>Verified
-                                    </div>
                                 </div>
-                                <button 
+                                <button
                                     onclick="openPhotoModal('${photoUrl}', '${student.nama}')"
                                     class="mt-4 btn-secondary text-sm">
                                     <i class="fas fa-expand mr-2"></i>Lihat Foto
                                 </button>
                             </div>
                         </div>
-                        
+
                         <!-- Student Information -->
                         <div class="lg:col-span-2">
-                            <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 mb-6">
-                                <h3 class="text-2xl font-bold text-white mb-2">${student.nama}</h3>
-                                <p class="text-blue-100 text-lg">${student.perguruan_tinggi}</p>
-                            </div>
-                            
+                            <h3 class="student-name text-2xl font-bold text-gray-900 mb-2">${student.nama}</h3>
+                            <p class="text-gray-600 text-lg mb-6">${student.perguruan_tinggi}</p>
+
                             <div class="space-y-6">
                                 <!-- Basic Information -->
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div class="bg-white bg-opacity-10 rounded-xl p-4">
-                                        <h4 class="font-semibold text-blue-200 mb-3 flex items-center">
+                                    <div class="bg-gray-50 rounded-xl p-4">
+                                        <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
                                             <i class="fas fa-id-card mr-2 text-yellow-300"></i>
                                             Identitas
                                         </h4>
                                         <div class="space-y-2">
                                             <div class="flex justify-between">
-                                                <span class="text-gray-300">NIM:</span>
-                                                <span class="text-white font-mono">${student.nim}</span>
+                                                <span class="text-gray-600">NIM:</span>
+                                                <span class="student-nim font-mono text-gray-900">${student.nim}</span>
                                             </div>
                                             <div class="flex justify-between">
-                                                <span class="text-gray-300">Jenis Kelamin:</span>
-                                                <span class="text-white">${student.jenis_kelamin}</span>
+                                                <span class="text-gray-600">Jenis Kelamin:</span>
+                                                <span class="text-gray-900">${student.jenis_kelamin}</span>
                                             </div>
                                             <div class="flex justify-between">
-                                                <span class="text-gray-300">Status:</span>
+                                                <span class="text-gray-600">Status:</span>
                                                 <span class="px-2 py-1 rounded-full text-xs font-semibold ${statusTerakhir === 'Aktif' ? 'bg-green-500 text-white' : 'bg-yellow-500 text-black'}">${statusTerakhir}</span>
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    <div class="bg-white bg-opacity-10 rounded-xl p-4">
-                                        <h4 class="font-semibold text-blue-200 mb-3 flex items-center">
+
+                                    <div class="bg-gray-50 rounded-xl p-4">
+                                        <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
                                             <i class="fas fa-graduation-cap mr-2 text-yellow-300"></i>
                                             Akademik
                                         </h4>
                                         <div class="space-y-2">
                                             <div class="flex justify-between">
-                                                <span class="text-gray-300">Angkatan:</span>
-                                                <span class="text-white">${student.angkatan}</span>
+                                                <span class="text-gray-600">Angkatan:</span>
+                                                <span class="text-gray-900">${student.angkatan}</span>
                                             </div>
                                             <div class="flex justify-between">
-                                                <span class="text-gray-300">Terdaftar:</span>
-                                                <span class="text-white">${tanggalMasuk}</span>
+                                                <span class="text-gray-600">Terdaftar:</span>
+                                                <span class="text-gray-900">${tanggalMasuk}</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Academic Program -->
-                                <div class="bg-white bg-opacity-10 rounded-xl p-6">
-                                    <h4 class="font-semibold text-blue-200 mb-4 flex items-center">
+                                <div class="bg-gray-50 rounded-xl p-6">
+                                    <h4 class="font-semibold text-gray-700 mb-4 flex items-center">
                                         <i class="fas fa-university mr-2 text-yellow-300"></i>
                                         Program Studi & Fakultas
                                     </h4>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <p class="text-gray-300 text-sm">Program Studi:</p>
-                                            <p class="text-white font-semibold text-lg">${student.prodi}</p>
+                                            <p class="text-gray-600 text-sm">Program Studi:</p>
+                                            <p class="student-prodi font-semibold text-lg text-gray-900">${student.prodi}</p>
                                         </div>
                                         <div>
-                                            <p class="text-gray-300 text-sm">Fakultas:</p>
-                                            <p class="text-white font-semibold text-lg">${student.fakultas}</p>
+                                            <p class="text-gray-600 text-sm">Fakultas:</p>
+                                            <p class="student-fakultas font-semibold text-lg text-gray-900">${student.fakultas}</p>
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Action Buttons -->
                                 <div class="flex flex-wrap gap-3 pt-4">
                                     <button onclick="downloadStudentData()" class="btn-primary">
@@ -1513,7 +1530,7 @@
         // Additional modern functions
         function downloadStudentData() {
             const studentData = {
-                nama: document.querySelector('.text-2xl.font-bold.text-white').textContent,
+                nama: document.querySelector('.student-name').textContent,
                 timestamp: new Date().toLocaleString('id-ID'),
                 exported_by: 'UB Mahasiswa Search',
                 ...getCurrentStudentData()
@@ -1536,7 +1553,7 @@
         
         function shareStudentData() {
             if (navigator.share) {
-                const studentName = document.querySelector('.text-2xl.font-bold.text-white').textContent;
+                const studentName = document.querySelector('.student-name').textContent;
                 navigator.share({
                     title: `Data Mahasiswa UB - ${studentName}`,
                     text: `Informasi mahasiswa ${studentName} dari Universitas Brawijaya`,
@@ -1602,10 +1619,10 @@
             if (!resultCard) return {};
             
             return {
-                nama: resultCard.querySelector('.text-2xl.font-bold.text-white')?.textContent || '',
-                nim: resultCard.querySelector('.font-mono')?.textContent || '',
-                prodi: resultCard.querySelector('.text-white.font-semibold.text-lg:nth-of-type(1)')?.textContent || '',
-                fakultas: resultCard.querySelector('.text-white.font-semibold.text-lg:nth-of-type(2)')?.textContent || '',
+                nama: resultCard.querySelector('.student-name')?.textContent || '',
+                nim: resultCard.querySelector('.student-nim')?.textContent || '',
+                prodi: resultCard.querySelector('.student-prodi')?.textContent || '',
+                fakultas: resultCard.querySelector('.student-fakultas')?.textContent || '',
                 jenis_kelamin: 'Tidak tersedia',
                 status_mahasiswa: 'Aktif',
                 perguruan_tinggi: 'Universitas Brawijaya'
