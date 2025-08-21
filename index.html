@@ -1057,19 +1057,27 @@
             showLoading();
             
             try {
-                // Use local PHP API to avoid CORS issues  
+                // Use local PHP API to avoid CORS issues
                 const response = await fetch(`api/search.php?query=${encodeURIComponent(name)}`);
-                
+
+                // Read raw text first to gracefully handle non-JSON responses
+                const rawText = await response.text();
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                
-                const data = await response.json();
-                
+
+                let data;
+                try {
+                    data = JSON.parse(rawText);
+                } catch (e) {
+                    throw new Error('Respons tidak valid dari server');
+                }
+
                 if (data.error) {
                     throw new Error(data.error);
                 }
-                
+
                 if (!data.mahasiswa || data.mahasiswa.length === 0) {
                     throw new Error('Data mahasiswa tidak ditemukan');
                 }
