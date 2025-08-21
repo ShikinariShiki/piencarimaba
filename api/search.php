@@ -17,7 +17,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 // Function to send JSON response safely
 function sendJsonResponse($data, $statusCode = 200) {
-    http_response_code($statusCode);
+    // Always return HTTP 200 to prevent hosting environments from
+    // overriding our JSON with their own HTML error pages
+    http_response_code(200);
+
+    // Preserve original status inside the payload for client-side handling
+    if (is_array($data) && !isset($data['status'])) {
+        $data['status'] = $statusCode;
+    }
+
     echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit();
 }
